@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: bash-monitor
+  labels: {app: bash-monitor}
+spec:
+  selector:
+    matchLabels: {app: bash-monitor}
+  template:
+    metadata:
+      labels: {app: bash-monitor}
+    spec:
+      serviceAccountName: bash-monitor               # For IRSA (optional)
+      containers:
+      - name: monitor
+        image: <ECR_URI>           # ← patch in build script
+        envFrom:
+        - configMapRef:
+            name: bash-monitor-env
+        ports:
+        - name: http
+          containerPort: 80
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        resources:
+          requests: {cpu: "50m", memory: "64Mi"}
+      volumes:
+      - name: data
+        emptyDir: {}
+---
+# ConfigMap to inject config.env
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bash-monitor-env
+data:
+  SCRAPE_INTERVAL: "15"
+  RENDER_INTERVAL: "30"

@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cw-agent-config
+data:
+  cwagentconfig.json: |
+    {
+      "logs": {
+        "logs_collected": {
+          "files": {
+            "collect_list": [
+              {
+                "file_path": "/data/metrics.db",
+                "log_group_name": "/eks/bash-monitor",
+                "log_stream_name": "{instance_id}"
+              }
+            ]
+          }
+        }
+      }
+    }
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cw-agent
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::<AWS_ACCOUNT_ID>:role/CWAgentRole
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cw-agent
+spec:
+  selector:
+    matchLabels: {app: cw-agent}
+  template:
+    metadata:
+      labels: {app: cw-agent}
+    spec:
+      serviceAccountName: cw-agent
+      containers:
+      - name: cloudwatch-agent
+        image: public.ecr.aws/cloudwatch-agent/cloudwatch-agent:latest
+        volumeMounts:
+        - name: cw-config
+          mountPath: /etc/cwagentconfig
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: cw-config
+        configMap:
+          name: cw-agent-config
+      - name: data
+        hostPath:
+          path: /data                # share with monitor Pods
+          type: DirectoryOrCreate

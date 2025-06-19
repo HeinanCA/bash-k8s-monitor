@@ -91,7 +91,7 @@ open http://localhost:8080
    - `kubectl logs` clean
    - No secrets in code/manifest
 
-We use GitHub Actions (`ci.yml`) to lint and build every PR. Green checks make maintainers happy.
+We use GitHub Actions (`main.yml`) to lint and build every PR. Green checks make maintainers happy.
 
 Not ready for code yet? → open an issue, propose an idea, or improve docs.
 

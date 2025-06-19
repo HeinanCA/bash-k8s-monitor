@@ -300,7 +300,7 @@ declare -A metric_info=(
 
 for png_file in cpu.png mem.png disk_r.png disk_w.png net_rx.png net_tx.png load1.png load5.png load15.png; do
   if [[ -f "$out/$png_file" ]]; then
-    IFS='|' read -r icon title <<< "${metric_info[$png_file]}"
+    IFS='|' read -r icon title <<<"${metric_info[$png_file]}"
     cat >>"$out/index.html" <<EOF
             <div class="metric-card">
                 <div class="metric-title">

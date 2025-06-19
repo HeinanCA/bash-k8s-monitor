@@ -9,7 +9,9 @@
 
 [**☕ Buy me a coffee**](https://coff.ee/heinanca)
 
-![demo](docs/demo.gif) <!-- drop a short screencast or strip this line -->
+![Bash-K8s Monitor Dashboard](docs/dashboard-preview.png)
+
+*Modern, responsive dashboard with real-time metrics visualization*
 
 ---
 

@@ -1,0 +1,63 @@
+name: Build & Push
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  shellcheck:
+    name: Shell Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run shellcheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          additional_files: 'build_push.sh'
+          ignore_paths: '.git'
+          ignore_names: '*.md,*.yml,*.yaml'
+          severity: error
+
+  shfmt:
+    name: Shell Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install shfmt
+        run: |
+          curl -L "https://github.com/mvdan/sh/releases/download/v3.7.0/shfmt_v3.7.0_linux_amd64" -o shfmt
+          chmod +x shfmt
+          sudo mv shfmt /usr/local/bin/
+
+      - name: Check shell formatting
+        run: |
+          shfmt -d -i 2 -ci **/*.sh || {
+            echo "❌ Shell files are not properly formatted"
+            echo "Run: shfmt -w -i 2 -ci **/*.sh"
+            exit 1
+          }
+
+  build-and-push:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    needs: [shellcheck, shfmt]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t bash-k8s-monitor:test .
+
+      - name: Test container starts
+        run: |
+          timeout 10s docker run --rm bash-k8s-monitor:test /bin/sh -c "echo 'Container test passed'" || {
+            echo "❌ Container failed to start properly"
+            exit 1
+          }

@@ -42,7 +42,7 @@ while getopts "r:n:t:d:c:m:h" opt; do
     d) DOCKERFILE="$OPTARG" ;;
     c) CONTEXT="$OPTARG" ;;
     m) MANIFEST="$OPTARG" ;;
-    h|*) usage ;;
+    h | *) usage ;;
   esac
 done
 
@@ -61,12 +61,12 @@ docker build -t "$REPO:$TAG" -f "$DOCKERFILE" "$CONTEXT"
 
 echo "📦  Ensuring ECR repo \"$REPO\" exists in $REGION…"
 aws ecr describe-repositories --repository-names "$REPO" --region "$REGION" \
-  >/dev/null 2>&1 || \
-aws ecr create-repository --repository-name "$REPO" --image-scanning-configuration scanOnPush=true --region "$REGION" >/dev/null
+  >/dev/null 2>&1 ||
+  aws ecr create-repository --repository-name "$REPO" --image-scanning-configuration scanOnPush=true --region "$REGION" >/dev/null
 
 echo "🔑  Logging into ECR…"
-aws ecr get-login-password --region "$REGION" \
-  | docker login --username AWS --password-stdin "$AWS_ID.dkr.ecr.$REGION.amazonaws.com"
+aws ecr get-login-password --region "$REGION" |
+  docker login --username AWS --password-stdin "$AWS_ID.dkr.ecr.$REGION.amazonaws.com"
 
 echo "🏷️   Tagging & pushing $ECR_URI…"
 docker tag "$REPO:$TAG" "$ECR_URI"
@@ -77,9 +77,9 @@ echo "✅  Image pushed successfully."
 # ---- Patch manifest --------------------------------------------------
 if [[ -f "$MANIFEST" ]]; then
   echo "📝  Patching $MANIFEST with new image URI…"
-  if sed --version >/dev/null 2>&1; then          # GNU sed
+  if sed --version >/dev/null 2>&1; then # GNU sed
     sed -i -E "s|image: .*|image: $ECR_URI|" "$MANIFEST"
-  else                                            # BSD / macOS sed
+  else # BSD / macOS sed
     sed -i '' -E "s|image: .*|image: $ECR_URI|" "$MANIFEST"
   fi
   echo "✅  Manifest updated."

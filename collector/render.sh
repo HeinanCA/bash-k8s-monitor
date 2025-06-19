@@ -23,15 +23,15 @@ plot_metric() {
 EOF
 }
 
-plot_metric 2  "CPU (%)"          "Percent"     cpu.png
-plot_metric 3  "Memory Used (B)"  "Bytes"       mem.png
-plot_metric 5  "Disk Reads/s"     "Sectors"     disk_r.png
-plot_metric 6  "Disk Writes/s"    "Sectors"     disk_w.png
-plot_metric 7  "Net RX (B)"       "Bytes"       net_rx.png
-plot_metric 8  "Net TX (B)"       "Bytes"       net_tx.png
-plot_metric 9  "Load 1‑min"       ""            load1.png
-plot_metric 10 "Load 5‑min"       ""            load5.png
-plot_metric 11 "Load 15‑min"      ""            load15.png
+plot_metric 2 "CPU (%)" "Percent" cpu.png
+plot_metric 3 "Memory Used (B)" "Bytes" mem.png
+plot_metric 5 "Disk Reads/s" "Sectors" disk_r.png
+plot_metric 6 "Disk Writes/s" "Sectors" disk_w.png
+plot_metric 7 "Net RX (B)" "Bytes" net_rx.png
+plot_metric 8 "Net TX (B)" "Bytes" net_tx.png
+plot_metric 9 "Load 1‑min" "" load1.png
+plot_metric 10 "Load 5‑min" "" load5.png
+plot_metric 11 "Load 15‑min" "" load15.png
 
 # Generate HTML wrapper
 cat >"$out/index.html" <<HTML

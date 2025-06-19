@@ -53,7 +53,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t bash-k8s-monitor:test .
+          docker build -f collector/Dockerfile -t bash-k8s-monitor:test .
 
       - name: Test container starts
         run: |

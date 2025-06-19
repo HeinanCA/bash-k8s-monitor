@@ -4,7 +4,7 @@ FROM alpine:3.20
 RUN apk add --no-cache bash gnuplot curl coreutils
 
 # Copy code
-COPY collector.sh render.sh /opt/
+COPY collector/collector.sh collector/render.sh /opt/
 COPY config.env /opt/config.env
 
 # Create data volume

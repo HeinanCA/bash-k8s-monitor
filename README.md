@@ -4,6 +4,7 @@
 
 *No Prometheus. No Grafana. No lock-in. Just the shell that ships with every Linux box.*
 
+[![Build & Push](https://github.com/HeinanCA/bash-k8s-monitor/actions/workflows/main.yml/badge.svg)](../../actions)
 [![License](https://img.shields.io/github/license/HeinanCA/bash-k8s-monitor?color=blue)](LICENSE)
 
 [**☕ Buy me a coffee**](https://coff.ee/heinanca)
@@ -44,7 +45,7 @@
 
 ```bash
 # 1) Clone
-git clone https://github.com/your-handle/bash-k8s-monitor.git
+git clone https://github.com/HeinanCA/bash-k8s-monitor.git
 cd bash-k8s-monitor
 
 # 2) Build, push to ECR, patch manifest
@@ -90,7 +91,7 @@ open http://localhost:8080
    - `kubectl logs` clean
    - No secrets in code/manifest
 
-We will (soon) use GitHub Actions (`ci.yml`) to lint and build every PR. Green checks make maintainers happy.
+We use GitHub Actions (`ci.yml`) to lint and build every PR. Green checks make maintainers happy.
 
 Not ready for code yet? → open an issue, propose an idea, or improve docs.
 
@@ -116,9 +117,9 @@ Fuel more late-night hacking sessions: [Buy me a coffee](https://coff.ee/heinanc
 
 ## 📝 License
 
-GPL 3.0 — see LICENSE for details. Commercial use welcome; attribution appreciated.
+GPL-3.0 — see LICENSE for details. Commercial use welcome; attribution appreciated.
 
 ---
 
 Built with 💚 by HT DevOps · More goodies at [htdevops.top](https://htdevops.top) ·  
-Upgrade your shell-fu with ([Mastering Bash Scripts](https://www.udemy.com/course/mastering-bash-scripts/?couponCode=08F7AB7FB06373BDB532)) – 40% off
+Upgrade your shell-fu with [Mastering Bash Scripts](https://www.udemy.com/course/mastering-bash-scripts/?couponCode=08F7AB7FB06373BDB532) – 40% off

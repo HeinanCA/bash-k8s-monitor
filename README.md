@@ -101,7 +101,7 @@ Not ready for code yet? → open an issue, propose an idea, or improve docs.
 
 ## 📅 Roadmap
 
-- Dark-mode CSS toggle
+- Dark-mode CSS toggle (DONE!)
 - Pod-level metrics (namespace & pod tags)
 - Native Prometheus pushgateway option
 - Helm chart / Kustomize overlay

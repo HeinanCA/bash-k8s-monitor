@@ -39,7 +39,7 @@ current_time=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 uptime_info=$(uptime | awk -F'up ' '{print $2}' | awk -F',' '{print $1}' | xargs)
 metric_count=$(find "$out" -name "*.png" 2>/dev/null | wc -l)
 
-# Generate modern HTML dashboard
+# Generate modern HTML dashboard with dark/light mode toggle
 cat >"$out/index.html" <<'HTML'
 <!DOCTYPE html>
 <html lang="en">
@@ -55,17 +55,89 @@ cat >"$out/index.html" <<'HTML'
             box-sizing: border-box;
         }
         
+        :root {
+            /* Dark mode colors (default) */
+            --bg-primary: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            --bg-secondary: rgba(255, 255, 255, 0.08);
+            --bg-tertiary: rgba(255, 255, 255, 0.05);
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-tertiary: #64748b;
+            --text-accent: #f1f5f9;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-hover: rgba(102, 126, 234, 0.5);
+            --card-hover-bg: rgba(255, 255, 255, 0.08);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-accent: linear-gradient(90deg, #667eea, #764ba2);
+            --shadow-hover: rgba(0, 0, 0, 0.3);
+        }
+        
+        [data-theme="light"] {
+            /* Light mode colors */
+            --bg-primary: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --bg-secondary: rgba(0, 0, 0, 0.04);
+            --bg-tertiary: rgba(0, 0, 0, 0.02);
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-tertiary: #64748b;
+            --text-accent: #0f172a;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --border-hover: rgba(102, 126, 234, 0.3);
+            --card-hover-bg: rgba(0, 0, 0, 0.06);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-accent: linear-gradient(90deg, #667eea, #764ba2);
+            --shadow-hover: rgba(0, 0, 0, 0.1);
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
-            color: #e2e8f0;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
             padding: 20px;
+            transition: all 0.3s ease;
         }
         
         .container {
             max-width: 1400px;
             margin: 0 auto;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            padding: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--card-hover-bg);
+            transform: scale(1.05);
+        }
+        
+        .theme-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-icon.inactive {
+            opacity: 0.4;
+            transform: scale(0.8);
         }
         
         header {
@@ -77,7 +149,7 @@ cat >"$out/index.html" <<'HTML'
         h1 {
             font-size: 2.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -86,20 +158,21 @@ cat >"$out/index.html" <<'HTML'
         
         .subtitle {
             font-size: 1.1rem;
-            color: #94a3b8;
+            color: var(--text-secondary);
             margin-bottom: 15px;
         }
         
         .last-update {
             font-size: 0.9rem;
-            color: #64748b;
+            color: var(--text-tertiary);
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--bg-tertiary);
             padding: 8px 16px;
             border-radius: 20px;
             backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
         }
         
         .metrics-grid {
@@ -110,11 +183,11 @@ cat >"$out/index.html" <<'HTML'
         }
         
         .metric-card {
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--bg-secondary);
             border-radius: 16px;
             padding: 20px;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -122,8 +195,8 @@ cat >"$out/index.html" <<'HTML'
         
         .metric-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 20px 40px var(--shadow-hover);
+            border-color: var(--border-hover);
         }
         
         .metric-card::before {
@@ -133,7 +206,7 @@ cat >"$out/index.html" <<'HTML'
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
+            background: var(--gradient-accent);
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -149,7 +222,7 @@ cat >"$out/index.html" <<'HTML'
             display: flex;
             align-items: center;
             gap: 8px;
-            color: #f1f5f9;
+            color: var(--text-accent);
         }
         
         .metric-icon {
@@ -160,7 +233,7 @@ cat >"$out/index.html" <<'HTML'
             width: 100%;
             height: auto;
             border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
             transition: transform 0.3s ease;
         }
         
@@ -176,22 +249,22 @@ cat >"$out/index.html" <<'HTML'
         }
         
         .overview-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--bg-tertiary);
             border-radius: 12px;
             padding: 20px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
             transition: all 0.3s ease;
         }
         
         .overview-card:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--card-hover-bg);
             transform: translateY(-2px);
         }
         
         .overview-title {
             font-size: 0.9rem;
-            color: #94a3b8;
+            color: var(--text-secondary);
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -200,7 +273,7 @@ cat >"$out/index.html" <<'HTML'
         .overview-value {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #f1f5f9;
+            color: var(--text-accent);
         }
         
         .status-indicator {
@@ -221,9 +294,9 @@ cat >"$out/index.html" <<'HTML'
         footer {
             text-align: center;
             padding: 30px 0;
-            color: #64748b;
+            color: var(--text-tertiary);
             font-size: 0.9rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid var(--border-color);
             margin-top: 40px;
         }
         
@@ -249,10 +322,20 @@ cat >"$out/index.html" <<'HTML'
             .container {
                 padding: 10px;
             }
+            
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <div class="theme-icon" id="darkIcon">🌙</div>
+        <div class="theme-icon" id="lightIcon">☀️</div>
+    </div>
+    
     <div class="container">
         <header>
             <h1>🩺 Bash-K8s Node Dashboard</h1>
@@ -313,7 +396,7 @@ EOF
   fi
 done
 
-# Close HTML structure
+# Close HTML structure with JavaScript for theme toggle
 cat >>"$out/index.html" <<'HTML'
         </div>
         
@@ -322,6 +405,56 @@ cat >>"$out/index.html" <<'HTML'
             Built with 💚 by <a href="https://htdevops.top" class="footer-link">HT DevOps</a>
         </footer>
     </div>
+    
+    <script>
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const darkIcon = document.getElementById('darkIcon');
+            const lightIcon = document.getElementById('lightIcon');
+            
+            if (body.hasAttribute('data-theme') && body.getAttribute('data-theme') === 'light') {
+                // Switch to dark mode
+                body.removeAttribute('data-theme');
+                darkIcon.classList.remove('inactive');
+                lightIcon.classList.add('inactive');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                // Switch to light mode
+                body.setAttribute('data-theme', 'light');
+                darkIcon.classList.add('inactive');
+                lightIcon.classList.remove('inactive');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        // Initialize theme on page load
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const darkIcon = document.getElementById('darkIcon');
+            const lightIcon = document.getElementById('lightIcon');
+            
+            if (savedTheme === 'light') {
+                document.body.setAttribute('data-theme', 'light');
+                darkIcon.classList.add('inactive');
+                lightIcon.classList.remove('inactive');
+            } else {
+                // Default to dark mode
+                darkIcon.classList.remove('inactive');
+                lightIcon.classList.add('inactive');
+            }
+        }
+        
+        // Initialize theme when page loads
+        document.addEventListener('DOMContentLoaded', initTheme);
+        
+        // Handle theme preference changes from other tabs
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'theme') {
+                initTheme();
+            }
+        });
+    </script>
 </body>
 </html>
 HTML
